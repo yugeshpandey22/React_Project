@@ -1,16 +1,44 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import axios from "axios";
 
 function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate(); // Initialize useNavigate
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError(""); // Clear error when user types
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await axios.post("http://localhost:5001/api/customers/login", formData);
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Login error:", err);
+      if (err.response?.status === 401) {
+        setError("Invalid email or password");
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Login failed. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,8 +58,14 @@ function Login() {
           <h2 className="text-3xl font-bold text-gray-800">Sign In</h2>
         </div>
 
+        {error && (
+          <div className="mt-4 p-2 bg-red-100 text-red-600 rounded-md text-center">
+            {error}
+          </div>
+        )}
+
         {/* Input Fields */}
-        <div className="mt-8 space-y-6">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="flex items-center bg-gray-300 rounded-full px-4 py-3">
             <input
               type="email"
@@ -40,6 +74,7 @@ function Login() {
               value={formData.email}
               onChange={handleChange}
               className="bg-transparent outline-none px-2 flex-1 text-gray-700"
+              required
             />
           </div>
           <div className="flex items-center bg-gray-300 rounded-full px-4 py-3">
@@ -50,14 +85,18 @@ function Login() {
               value={formData.password}
               onChange={handleChange}
               className="bg-transparent outline-none px-2 flex-1 text-gray-700"
+              required
             />
           </div>
-        </div>
 
-        {/* Sign In Button */}
-        <button className="mt-8 w-full bg-red-600 text-white py-3 rounded-full font-semibold hover:bg-red-700 transition-colors">
-          SIGN IN
-        </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-8 w-full bg-red-600 text-white py-3 rounded-full font-semibold hover:bg-red-700 transition-colors disabled:bg-red-400"
+          >
+            {loading ? "Signing in..." : "SIGN IN"}
+          </button>
+        </form>
 
         {/* Forgot Password */}
         <div className="mt-4 text-center">

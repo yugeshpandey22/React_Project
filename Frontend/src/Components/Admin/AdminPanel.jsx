@@ -1,4 +1,3 @@
-import React from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
 const AdminPanel = () => {
@@ -15,7 +14,7 @@ const AdminPanel = () => {
       <aside className="w-64 bg-teal-500 text-white p-4 space-y-4">
         <h2 className="text-2xl font-bold">Smart Dhopa</h2>
         <ul className="space-y-2">
-        <li>
+          <li>
             <NavLink
               to="/admin/admindashboard"
               className={({ isActive }) =>
@@ -58,9 +57,8 @@ const AdminPanel = () => {
 
       {/* Main Content */}
       <main className="flex-1 p-6">
-        <Outlet /> {/* Renders Orders or Customers */}
+        <Outlet />
       </main>
-      
     </div>
   );
 };
