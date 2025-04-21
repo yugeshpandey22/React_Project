@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Login() {
@@ -10,8 +10,8 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate(); // Initialize useNavigate
-
+  const navigate = useNavigate();
+  
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError(""); // Clear error when user types
@@ -24,9 +24,16 @@ function Login() {
 
     try {
       const response = await axios.post("http://localhost:5001/api/customers/login", formData);
+      
+      // Store authentication data
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
-      navigate("/dashboard");
+      
+      // Trigger storage event for App.js to detect login
+      window.dispatchEvent(new Event('storage'));
+      
+      // Navigate to the intended destination or home page
+      navigate('/', { replace: true });
     } catch (err) {
       console.error("Login error:", err);
       if (err.response?.status === 401) {
@@ -98,8 +105,21 @@ function Login() {
           </button>
         </form>
 
-        {/* Forgot Password */}
+        {/* Sign Up Link */}
         <div className="mt-4 text-center">
+          <p className="text-gray-700">
+             Don&apos;t have an account {" "}
+            <span 
+              onClick={() => navigate("/signup")}
+              className="text-red-600 font-semibold cursor-pointer hover:underline"
+            >
+              Sign Up
+            </span>
+          </p>
+        </div>
+
+        {/* Forgot Password */}
+        <div className="mt-2 text-center">
           <a href="#" className="text-gray-600 hover:text-red-600">
             Forgot your password?
           </a>

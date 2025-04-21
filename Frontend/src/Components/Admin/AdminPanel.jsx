@@ -4,7 +4,14 @@ const AdminPanel = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
+    // Clear admin authentication data
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("admin");
+    
+    // Trigger storage event for App.js to detect logout
+    window.dispatchEvent(new Event('storage'));
+    
+    // Navigate to admin login page
     navigate("/adminloginpage");
   };
 
@@ -45,12 +52,12 @@ const AdminPanel = () => {
             </NavLink>
           </li>
         </ul>
-        <div className="mt-96">
+        <div className="mt-auto pt-10">
           <button
             onClick={handleLogout}
-            className="bg-red-600 px-4 py-2 rounded text-white"
+            className="bg-red-600 w-full px-4 py-2 rounded text-white hover:bg-red-700 transition-colors"
           >
-            Logout
+            Admin Logout
           </button>
         </div>
       </aside>
